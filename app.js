@@ -61,13 +61,11 @@ const APP_DATA = {
         }
     ]
 };
-
 const State = {
     cart: JSON.parse(localStorage.getItem('fh_cart')) || [],
     orders: JSON.parse(localStorage.getItem('fh_orders')) || [],
-    user: JSON.parse(localStorage.getItem('fh_user')) || null, // Naya User State
+    user: JSON.parse(localStorage.getItem('fh_user')) || null,
     currentFilter: 'all',
-
     saveCart() {
         localStorage.setItem('fh_cart', JSON.stringify(this.cart));
         this.updateGlobalBadge();
@@ -131,7 +129,6 @@ const State = {
         document.getElementById('global-cart-count').innerText = total;
     }
 };
-
 const Router = {
     routes: {
         home: renderHome,
@@ -151,14 +148,10 @@ const Router = {
         const navId = `nav-${route}`;
         const activeNav = document.getElementById(navId);
         if (activeNav) activeNav.classList.add('active');
-
         this.routes[route](param);
     }
 };
-
 const appView = document.getElementById('app-view');
-
-// Naye Auth Views 
 function renderLogin() {
     appView.innerHTML = `
         <div class="container auth-container" style="max-width: 400px; padding: 60px 24px; margin: 0 auto;">
@@ -185,7 +178,6 @@ function renderLogin() {
         </div>
     `;
 }
-
 function renderSignup() {
     appView.innerHTML = `
         <div class="container auth-container" style="max-width: 400px; padding: 60px 24px; margin: 0 auto;">
@@ -217,7 +209,6 @@ function renderSignup() {
         </div>
     `;
 }
-
 function renderForgot() {
     appView.innerHTML = `
         <div class="container auth-container" style="max-width: 400px; padding: 60px 24px; margin: 0 auto;">
@@ -245,22 +236,17 @@ function renderForgot() {
         </div>
     `;
 }
-
 function renderProfile() {
     if (!State.user) return Router.navigate('login');
-    
     const emailValue = State.user.email ? State.user.email : '';
-
     appView.innerHTML = `
         <div class="container auth-container" style="max-width: 600px; padding: 60px 24px; margin: 0 auto;">
             <div class="cart-box">
                 <h2 style="margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--bg-light);">My Account</h2>
-                
                 <div style="margin-bottom: 24px;">
                     <p style="color: var(--text-muted); margin-bottom: 4px; font-size: 0.85rem;">Registered Mobile Number</p>
                     <p style="font-weight: 600; font-size: 1.1rem;">+91 ${State.user.mobile}</p>
                 </div>
-
                 <form onsubmit="saveEmail(event)">
                     <div class="form-group">
                         <label>Email Address</label>
@@ -270,29 +256,23 @@ function renderProfile() {
                         </div>
                     </div>
                 </form>
-                
                 <hr style="border: 0; border-top: 1px dashed #d3d3d3; margin: 32px 0 24px 0;">
-                
                 <button onclick="State.logout()" class="btn btn-outline" style="width: 100%; color: #dc3545; border-color: #dc3545;">Logout Account</button>
             </div>
         </div>
     `;
 }
-
-// Auth Handlers
 function handleLogin(e) {
     e.preventDefault();
     const mobile = document.getElementById('login-mobile').value;
     State.saveUser({ mobile: mobile });
     Router.navigate('home');
 }
-
 function handleSignup(e) {
     e.preventDefault();
     const mobile = document.getElementById('signup-mobile').value;
     const pass = document.getElementById('signup-password').value;
     const confirm = document.getElementById('signup-confirm').value;
-
     if (pass !== confirm) {
         alert("Passwords do not match!");
         return;
@@ -300,12 +280,10 @@ function handleSignup(e) {
     State.saveUser({ mobile: mobile });
     Router.navigate('home');
 }
-
 function handleForgot(e) {
     e.preventDefault();
     const pass = document.getElementById('forgot-password').value;
     const confirm = document.getElementById('forgot-confirm').value;
-
     if (pass !== confirm) {
         alert("Passwords do not match!");
         return;
@@ -313,16 +291,12 @@ function handleForgot(e) {
     alert("Password reset successfully! Please login with your new password.");
     Router.navigate('login');
 }
-
 function saveEmail(e) {
     e.preventDefault();
     const email = document.getElementById('profile-email').value;
     State.saveUser({ email: email });
     alert("Email saved successfully!");
 }
-
-
-// Purane functions exactly same rakhe hain
 function renderHome() {
     appView.innerHTML = `
         <section class="hero">
@@ -343,12 +317,10 @@ function renderHome() {
             <div class="grid" id="restaurant-grid"></div>
         </div>
     `;
-
     const grid = document.getElementById('restaurant-grid');
     const targetRestaurants = State.currentFilter === 'all' 
         ? APP_DATA.restaurants 
         : APP_DATA.restaurants.filter(r => r.category === State.currentFilter);
-
     targetRestaurants.forEach(res => {
         const card = document.createElement('div');
         card.className = 'card';
@@ -370,16 +342,13 @@ function renderHome() {
         grid.appendChild(card);
     });
 }
-
 function filterHome(category) {
     State.currentFilter = category;
     renderHome();
 }
-
 function renderRestaurantDetail(resId) {
     const res = APP_DATA.restaurants.find(r => r.id === resId);
     if (!res) return Router.navigate('home');
-
     appView.innerHTML = `
         <div class="container">
             <div class="restaurant-banner">
@@ -399,7 +368,6 @@ function renderRestaurantDetail(resId) {
             </div>
         </div>
     `;
-
     const listContainer = document.getElementById('menu-items-list');
     res.menu.forEach(item => {
         const div = document.createElement('div');
@@ -420,14 +388,12 @@ function renderRestaurantDetail(resId) {
         listContainer.appendChild(div);
     });
 }
-
 function handleAddToCart(resId, itemId) {
     const res = APP_DATA.restaurants.find(r => r.id === resId);
     const item = res.menu.find(m => m.id === itemId);
     State.addToCart(item, res);
     alert(`${item.name} added to your cart.`);
 }
-
 function renderCart() {
     if(State.cart.length === 0) {
         appView.innerHTML = `
@@ -439,11 +405,9 @@ function renderCart() {
         `;
         return;
     }
-
     let itemsSubtotal = 0;
     let deliveryFee = 40;
     let GST = 0;
-
     let itemsHtml = '';
     State.cart.forEach(item => {
         const rowTotal = item.price * item.qty;
@@ -465,10 +429,8 @@ function renderCart() {
             </div>
         `;
     });
-
     GST = Math.round(itemsSubtotal * 0.05);
     let totalToPay = itemsSubtotal + deliveryFee + GST;
-
     appView.innerHTML = `
         <div class="container">
             <div class="cart-layout">
@@ -477,7 +439,6 @@ function renderCart() {
                         <div class="cart-title">Review Items</div>
                         ${itemsHtml}
                     </div>
-                    
                     <div class="cart-box">
                         <div class="cart-title">Delivery Details</div>
                         <form id="checkout-form" onsubmit="processCheckout(event)">
@@ -499,7 +460,6 @@ function renderCart() {
                         </form>
                     </div>
                 </div>
-
                 <div class="cart-box" style="height: fit-content;">
                     <div class="cart-title">Bill Details</div>
                     <div class="summary-row">
@@ -524,25 +484,19 @@ function renderCart() {
         </div>
     `;
 }
-
 function changeCartQty(itemId, change) {
     State.updateQty(itemId, change);
     renderCart();
 }
-
 function processCheckout(event) {
     event.preventDefault();
-    
-    // Yahan ensure karo ki agar user login nahi hai to login pe bhejo
     if (!State.user) {
         alert("Please login first to place an order!");
         Router.navigate('login');
         return;
     }
-    
     const subtotal = State.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     const total = subtotal + 40 + Math.round(subtotal * 0.05);
-
     const newOrder = {
         orderId: "FH-" + Math.floor(100000 + Math.random() * 900000),
         timestamp: new Date().toLocaleString(),
@@ -552,14 +506,11 @@ function processCheckout(event) {
         items: [...State.cart],
         grandTotal: total
     };
-
     State.orders.unshift(newOrder);
     State.saveOrders();
     State.clearCart();
-    
     Router.navigate('success', newOrder.orderId);
 }
-
 function renderSuccess(orderId) {
     appView.innerHTML = `
         <div class="container">
@@ -575,7 +526,6 @@ function renderSuccess(orderId) {
         </div>
     `;
 }
-
 function renderOrders() {
     if(State.orders.length === 0) {
         appView.innerHTML = `
@@ -587,7 +537,6 @@ function renderOrders() {
         `;
         return;
     }
-
     let ordersHtml = '';
     State.orders.forEach(order => {
         let itemsSummary = order.items.map(i => `${i.name} (${i.qty})`).join(', ');
@@ -612,7 +561,6 @@ function renderOrders() {
             </div>
         `;
     });
-
     appView.innerHTML = `
         <div class="container" style="max-width: 800px; padding-top: 40px; padding-bottom: 60px;">
             <h2 class="section-title">Your Order History Tracker</h2>
@@ -620,9 +568,8 @@ function renderOrders() {
         </div>
     `;
 }
-
 document.addEventListener("DOMContentLoaded", () => {
     State.updateGlobalBadge();
-    State.updateNavAuth(); // Nav state sync check on load
+    State.updateNavAuth(); 
     Router.navigate('home');
 });
