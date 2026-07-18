@@ -574,3 +574,109 @@ footer {
 .profile-dropdown:hover .dropdown-content {
     display: block;
 }
+/* ========================================= */
+/* --- RESPONSIVE MEDIA QUERIES (MOBILE) --- */
+/* ========================================= */
+
+/* Tablet & Smaller Screens (768px aur usse chhota) */
+@media (max-width: 768px) {
+    /* Navbar text aur spacing adjust */
+    .nav-links {
+        gap: 16px;
+        font-size: 0.9rem;
+    }
+    .logo {
+        font-size: 1.3rem;
+    }
+    
+    /* Hero Section ko chhota karna */
+    .hero {
+        padding: 40px 0;
+    }
+    .hero h1 {
+        font-size: 2.2rem;
+    }
+    .hero p {
+        font-size: 1rem;
+    }
+
+    /* Cart Layout (Aapka purana logic) */
+    .cart-layout { 
+        grid-template-columns: 1fr; 
+    }
+    
+    /* Menu items ko mobile par upar-neeche stack karna */
+    .menu-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    .menu-item-details {
+        padding-right: 0;
+        width: 100%;
+    }
+    .menu-item-action {
+        width: 100%;
+        height: 180px;
+        margin-top: 10px;
+    }
+    .menu-item-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .add-btn-container {
+        bottom: -15px;
+        width: 120px; /* Button thoda bada mobile ke liye */
+    }
+}
+
+/* Small Mobile Phones (480px aur usse chhota) */
+@media (max-width: 480px) {
+    /* Navbar ko stack karna (Logo upar, links neeche) */
+    .navbar {
+        height: auto;
+    }
+    .nav-container {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px 0;
+    }
+    
+    /* Navbar lamba hone ke karan main section ko thoda neeche push karna */
+    main {
+        margin-top: 110px; 
+    }
+
+    /* Fonts aur spacing reduce karna */
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+    .section-title {
+        font-size: 1.3rem;
+    }
+    
+    /* Category Filter chips */
+    .filter-section {
+        gap: 8px;
+    }
+    .filter-chip {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    /* Card Images height */
+    .card-img-wrapper {
+        height: 160px;
+    }
+    
+    /* Success Page Icon */
+    .success-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+    }
+    .success-view {
+        padding: 40px 0;
+    }
+}
