@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodHub | Premium Food Delivery Marketplace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo" onclick="Router.navigate('home')">Food<span>Hub</span></a>
+            <ul class="nav-links">
+                <li><a class="nav-item active" id="nav-home" onclick="Router.navigate('home')">Home</a></li>
+                <li><a class="nav-item" id="nav-orders" onclick="Router.navigate('orders')">Past Orders</a></li>
+                <li>
+                    <a class="nav-item cart-badge-container" id="nav-cart" onclick="Router.navigate('cart')">
+                        Cart <span class="cart-count" id="global-cart-count">0</span>
+                    </a>
+                </li>
+                <!-- Naya Login/Profile Option -->
+                <li><a class="nav-item" id="nav-auth">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main id="app-view"></main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>FoodHub</h4>
+                    <p style="color: rgba(255,255,255,0.5); margin-top: 8px;">Premium multi-restaurant marketplace.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><a href="#">Help & Support</a></li>
+                        <li><a href="#">Partner with us</a></li>
+                        <li><a href="#">Ride with us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Terms & Conditions</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2026 FoodHub. Developed by us with ❤️❤️
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
