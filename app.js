@@ -66,6 +66,7 @@ const State = {
     orders: JSON.parse(localStorage.getItem('fh_orders')) || [],
     user: JSON.parse(localStorage.getItem('fh_user')) || null,
     currentFilter: 'all',
+    deliveryDistanceKm: 3, // Default distance calculation baseline (e.g., 3 km)
     saveCart() {
         localStorage.setItem('fh_cart', JSON.stringify(this.cart));
         this.updateGlobalBadge();
@@ -136,14 +137,13 @@ const Router = {
         cart: renderCart,
         orders: renderOrders,
         success: renderSuccess,
-        login: renderLogin,           // Naye Routes
+        login: renderLogin,
         signup: renderSignup,         
         forgot: renderForgot,         
         profile: renderProfile        
     },
     navigate(route, param = null) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
+        window.scrollTo({ top: 0, behavior: 'smooth' });      
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         const navId = `nav-${route}`;
         const activeNav = document.getElementById(navId);
@@ -159,8 +159,8 @@ function renderLogin() {
                 <h2 style="margin-bottom: 24px; text-align: center;">Login</h2>
                 <form onsubmit="handleLogin(event)">
                     <div class="form-group">
-                        <label>Mobile Number</label>
-                        <input type="tel" id="login-mobile" class="form-control" placeholder="10-digit mobile number" required pattern="[0-9]{10}">
+                        <label>Email or Mobile Number</label>
+                        <input type="text" id="login-identifier" class="form-control" placeholder="Enter email or 10-digit mobile" required>
                     </div>
                     <div class="form-group">
                         <label>Password</label>
@@ -185,8 +185,12 @@ function renderSignup() {
                 <h2 style="margin-bottom: 24px; text-align: center;">Sign Up</h2>
                 <form onsubmit="handleSignup(event)">
                     <div class="form-group">
-                    <label> Full Name </label>
-                    <input type="text" id= "signup-Name" class="form-control" placeholder= "Enter Your Full Name"></input>
+                        <label>Full Name</label>
+                        <input type="text" id="signup-name" class="form-control" placeholder="Enter Your Full Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="signup-email" class="form-control" placeholder="Enter your email address" required>
                     </div>
                     <div class="form-group">
                         <label>Mobile Number</label>
@@ -216,8 +220,8 @@ function renderForgot() {
                 <h2 style="margin-bottom: 24px; text-align: center;">Reset Password</h2>
                 <form onsubmit="handleForgot(event)">
                     <div class="form-group">
-                        <label>Mobile Number</label>
-                        <input type="tel" class="form-control" placeholder="Registered mobile number" required pattern="[0-9]{10}">
+                        <label>Email or Mobile Number</label>
+                        <input type="text" class="form-control" placeholder="Registered email or mobile" required>
                     </div>
                     <div class="form-group">
                         <label>New Password</label>
@@ -239,22 +243,37 @@ function renderForgot() {
 function renderProfile() {
     if (!State.user) return Router.navigate('login');
     const emailValue = State.user.email ? State.user.email : '';
+    const mobileValue = State.user.mobile ? State.user.mobile : '';
+    const nameValue = State.user.name ? State.user.name : 'Valued Customer';
     appView.innerHTML = `
         <div class="container auth-container" style="max-width: 600px; padding: 60px 24px; margin: 0 auto;">
             <div class="cart-box">
-                <h2 style="margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--bg-light);">My Account</h2>
-                <div style="margin-bottom: 24px;">
-                    <p style="color: var(--text-muted); margin-bottom: 4px; font-size: 0.85rem;">Registered Mobile Number</p>
-                    <p style="font-weight: 600; font-size: 1.1rem;">+91 ${State.user.mobile}</p>
-                </div>
-                <form onsubmit="saveEmail(event)">
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <div style="display:flex; gap: 12px;">
-                            <input type="email" id="profile-email" class="form-control" placeholder="Add your email address" value="${emailValue}">
-                            <button type="submit" class="btn btn-primary">Save</button>
-                        </div>
+                <h2 style="margin-bottom: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--bg-light);">My Account</h2>
+                <p style="color: var(--primary); font-weight: 600; margin-bottom: 24px;">${nameValue}</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                    <div>
+                        <p style="color: var(--text-muted); margin-bottom: 4px; font-size: 0.85rem;">Mobile Number</p>
+                        <p style="font-weight: 600; font-size: 1.05rem;">${mobileValue ? '+91 ' + mobileValue : 'Not Provided'}</p>
                     </div>
+                    <div>
+                        <p style="color: var(--text-muted); margin-bottom: 4px; font-size: 0.85rem;">Email Address</p>
+                        <p style="font-weight: 600; font-size: 1.05rem;">${emailValue || 'Not Provided'}</p>
+                    </div>
+                </div>
+                <form onsubmit="updateProfileDetails(event)">
+                    <div class="form-group">
+                        <label>Update Full Name</label>
+                        <input type="text" id="profile-name" class="form-control" value="${nameValue}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Update Email Address</label>
+                        <input type="email" id="profile-email" class="form-control" value="${emailValue}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Update Mobile Number</label>
+                        <input type="tel" id="profile-mobile" class="form-control" value="${mobileValue}" pattern="[0-9]{10}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Save Changes</button>
                 </form>
                 <hr style="border: 0; border-top: 1px dashed #d3d3d3; margin: 32px 0 24px 0;">
                 <button onclick="State.logout()" class="btn btn-outline" style="width: 100%; color: #dc3545; border-color: #dc3545;">Logout Account</button>
@@ -264,12 +283,19 @@ function renderProfile() {
 }
 function handleLogin(e) {
     e.preventDefault();
-    const mobile = document.getElementById('login-mobile').value;
-    State.saveUser({ mobile: mobile });
+    const identifier = document.getElementById('login-identifier').value;
+    // Check if input is email or mobile
+    if (identifier.includes('@')) {
+        State.saveUser({ email: identifier, mobile: State.user?.mobile || "" });
+    } else {
+        State.saveUser({ mobile: identifier, email: State.user?.email || "" });
+    }
     Router.navigate('home');
 }
 function handleSignup(e) {
     e.preventDefault();
+    const name = document.getElementById('signup-name').value;
+    const email = document.getElementById('signup-email').value;
     const mobile = document.getElementById('signup-mobile').value;
     const pass = document.getElementById('signup-password').value;
     const confirm = document.getElementById('signup-confirm').value;
@@ -277,7 +303,7 @@ function handleSignup(e) {
         alert("Passwords do not match!");
         return;
     }
-    State.saveUser({ mobile: mobile });
+    State.saveUser({ name, email, mobile });
     Router.navigate('home');
 }
 function handleForgot(e) {
@@ -288,14 +314,16 @@ function handleForgot(e) {
         alert("Passwords do not match!");
         return;
     }
-    alert("Password reset successfully! Please login with your new password.");
+    alert("Password reset successfully! Please login with your new credentials.");
     Router.navigate('login');
 }
-function saveEmail(e) {
+function updateProfileDetails(e) {
     e.preventDefault();
+    const name = document.getElementById('profile-name').value;
     const email = document.getElementById('profile-email').value;
-    State.saveUser({ email: email });
-    alert("Email saved successfully!");
+    const mobile = document.getElementById('profile-mobile').value;
+    State.saveUser({ name, email, mobile });
+    alert("Profile updated successfully!");
 }
 function renderHome() {
     appView.innerHTML = `
@@ -394,6 +422,26 @@ function handleAddToCart(resId, itemId) {
     State.addToCart(item, res);
     alert(`${item.name} added to your cart.`);
 }
+function calculateDeliveryFee(distanceKm) {
+    // Base fee: ₹20 for the first 2 km, then ₹10 for every subsequent km
+    let baseKmLimit = 2;
+    let baseFee = 20;
+    let ratePerExtraKm = 5;
+    if (distanceKm <= baseKmLimit) {
+        return baseFee;
+    } else {
+        return baseFee + Math.ceil(distanceKm - baseKmLimit) * ratePerExtraKm;
+    }
+}
+function updateCartCalculations() {
+    const distanceInput = document.getElementById('f-distance');
+    if (distanceInput) {
+        let val = parseFloat(distanceInput.value);
+        if (isNaN(val) || val < 1) val = 1;
+        State.deliveryDistanceKm = val;
+    }
+    renderCart();
+}
 function renderCart() {
     if(State.cart.length === 0) {
         appView.innerHTML = `
@@ -406,7 +454,7 @@ function renderCart() {
         return;
     }
     let itemsSubtotal = 0;
-    let deliveryFee = 40;
+    let deliveryFee = calculateDeliveryFee(State.deliveryDistanceKm);
     let GST = 0;
     let itemsHtml = '';
     State.cart.forEach(item => {
@@ -431,6 +479,7 @@ function renderCart() {
     });
     GST = Math.round(itemsSubtotal * 0.05);
     let totalToPay = itemsSubtotal + deliveryFee + GST;
+    const userPhone = State.user?.mobile || '';
     appView.innerHTML = `
         <div class="container">
             <div class="cart-layout">
@@ -447,8 +496,13 @@ function renderCart() {
                                 <input type="text" class="form-control" placeholder="Flat, House no., Apartment, Street" required id="f-address">
                             </div>
                             <div class="form-group">
+                                <label>Delivery Distance (in Kilometers)</label>
+                                <input type="number" step="0.5" min="1" max="50" class="form-control" value="${State.deliveryDistanceKm}" id="f-distance" oninput="updateCartCalculations()" required>
+                                <small style="color: var(--text-muted); font-size: 0.75rem;">Fee structure: ₹20 for first 2 km, then ₹10/km extra.</small>
+                            </div>
+                            <div class="form-group">
                                 <label>Contact Phone Number</label>
-                                <input type="tel" class="form-control" placeholder="10-digit mobile number" required id="f-phone">
+                                <input type="tel" class="form-control" placeholder="10-digit mobile number" value="${userPhone}" required id="f-phone" pattern="[0-9]{10}">
                             </div>
                             <div class="form-group" style="margin-bottom: 0;">
                                 <label>Payment Mode Selection</label>
@@ -467,7 +521,7 @@ function renderCart() {
                         <span>₹${itemsSubtotal}</span>
                     </div>
                     <div class="summary-row">
-                        <span style="color: var(--text-muted);">Delivery Fee</span>
+                        <span style="color: var(--text-muted);">Delivery Fee (${State.deliveryDistanceKm} km)</span>
                         <span>₹${deliveryFee}</span>
                     </div>
                     <div class="summary-row">
@@ -496,11 +550,14 @@ function processCheckout(event) {
         return;
     }
     const subtotal = State.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    const total = subtotal + 40 + Math.round(subtotal * 0.05);
+    const currentDeliveryFee = calculateDeliveryFee(State.deliveryDistanceKm);
+    const total = subtotal + currentDeliveryFee + Math.round(subtotal * 0.05);
+    
     const newOrder = {
         orderId: "FH-" + Math.floor(100000 + Math.random() * 900000),
         timestamp: new Date().toLocaleString(),
         address: document.getElementById('f-address').value,
+        distance: State.deliveryDistanceKm,
         phone: document.getElementById('f-phone').value,
         paymentMode: document.getElementById('f-pay').value,
         items: [...State.cart],
@@ -556,7 +613,7 @@ function renderOrders() {
                     <strong>Dishes:</strong> ${itemsSummary}
                 </div>
                 <div style="font-size: 0.85rem; color: var(--text-muted);">
-                    <strong>Delivery Area:</strong> ${order.address} | <strong>Mode:</strong> ${order.paymentMode}
+                    <strong>Delivery Area:</strong> ${order.address} (${order.distance || 3} km) | <strong>Mode:</strong> ${order.paymentMode}
                 </div>
             </div>
         `;
